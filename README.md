@@ -1,49 +1,69 @@
 local TweenService = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
 
 -- Estado inicial
 main.Visible = false
-main.Size = UDim2.new(0, 300, 0, 380)
+main.AnchorPoint = Vector2.new(0.5, 0.5)
+main.Position = UDim2.new(0.5, 0, 0.5, 0)
+main.Size = UDim2.new(0.7, 0, 0.6, 0)
 main.BackgroundTransparency = 1
 
--- Guardar tamanho final
-local finalSize = UDim2.new(0, 350, 0, 440)
+-- Tamanho final (mobile-friendly)
+local finalSize = UDim2.new(0.85, 0, 0.75, 0)
 
--- Função abrir
+local isAnimating = false
+
+-- Abrir hub
 local function openHub()
-    main.Visible = true
-    main.Size = UDim2.new(0, 300, 0, 380)
-    main.BackgroundTransparency = 1
+	if isAnimating then return end
+	isAnimating = true
 
-    TweenService:Create(
-        main,
-        TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
-        {
-            Size = finalSize,
-            BackgroundTransparency = 0
-        }
-    ):Play()
+	main.Visible = true
+	main.Size = UDim2.new(0.7, 0, 0.6, 0)
+	main.BackgroundTransparency = 1
+
+	local tween = TweenService:Create(
+		main,
+		TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+		{
+			Size = finalSize,
+			BackgroundTransparency = 0
+		}
+	)
+
+	tween:Play()
+	tween.Completed:Wait()
+	isAnimating = false
 end
 
--- Função fechar
+-- Fechar hub
 local function closeHub()
-    local tween = TweenService:Create(
-        main,
-        TweenInfo.new(0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.In),
-        {
-            Size = UDim2.new(0, 300, 0, 380),
-            BackgroundTransparency = 1
-        }
-    )
-    tween:Play()
-    tween.Completed:Wait()
-    main.Visible = false
+	if isAnimating then return end
+	isAnimating = true
+
+	local tween = TweenService:Create(
+		main,
+		TweenInfo.new(0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.In),
+		{
+			Size = UDim2.new(0.7, 0, 0.6, 0),
+			BackgroundTransparency = 1
+		}
+	)
+
+	tween:Play()
+	tween.Completed:Wait()
+	main.Visible = false
+	isAnimating = false
 end
 
--- ================= BOTÃO FLUTUANTE =================
+-- Botão flutuante (touch-friendly)
+floatBtn.AutoButtonColor = true
+floatBtn.Size = UDim2.new(0, 60, 0, 60)
+
 floatBtn.MouseButton1Click:Connect(function()
-    if main.Visible then
-        closeHub()
-    else
-        openHub()
-    end
+	if main.Visible then
+		closeHub()
+	else
+		openHub()
+	end
 end)
